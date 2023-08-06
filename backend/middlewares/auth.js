@@ -6,7 +6,10 @@ const UnauthorizedError = require('../errors/unauthorized-err');
 const auth = (req, res, next) => {
   const token = req.cookies.jwt;
 
-  if (!token) next(new UnauthorizedError('Необходима авторизация'));
+  if (!token) {
+    next(new UnauthorizedError('Необходима авторизация'));
+  return;
+  }
 
   let payload;
 
@@ -14,6 +17,7 @@ const auth = (req, res, next) => {
     payload = jwt.verify(token, config.JWT_SECRET);
   } catch (err) {
     next(new UnauthorizedError('Необходима авторизация'));
+    return;
   }
 
   req.user = payload;

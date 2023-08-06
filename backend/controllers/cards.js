@@ -8,7 +8,7 @@ const ForbiddenError = require('../errors/forbidden-err');
 const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => {
-      if (cards) res.status(200).send(cards);
+      res.status(200).send(cards);
     })
     .catch(next);
 };

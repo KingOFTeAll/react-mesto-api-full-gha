@@ -24,13 +24,7 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-
-  User.findOne({ email })
-    .then((userExists) => {
-      if (userExists) {
-        throw new ConflictError('Пользователь с таким email уже зарегистрирован');
-      }
-      bcrypt.hash(password, SALT_ROUNDS)
+        bcrypt.hash(password, SALT_ROUNDS)
         .then((hash) => User.create({
           name,
           about,
@@ -43,21 +37,13 @@ const createUser = (req, res, next) => {
             _id: user._id, name, about, avatar, email,
           });
         })
-        .catch((error) => {
-          if (error instanceof mongoose.Error.ValidationError) {
-            throw new ValidationError('Невалидные данные');
-          }
-          next(error);
-        });
-    })
-    .catch(next);
+        .catch(next);
 };
 
 const getUser = (req, res, next) => {
   const { userId } = req.params;
 
   User.findById(userId)
-    .orFail(new NotFoundError('Пользователь по данному id не найден'))
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь по данному id не найден');
@@ -65,12 +51,7 @@ const getUser = (req, res, next) => {
         res.status(200).send(user);
       }
     })
-    .catch((error) => {
-      if (error instanceof mongoose.Error.CastError) {
-        throw new ValidationError('Некорректные данные');
-      }
-      next(error);
-    });
+    .catch(next);
 };
 
 const updateProfile = (req, res, next) => {
@@ -89,12 +70,7 @@ const updateProfile = (req, res, next) => {
       }
       res.status(200).send(user);
     })
-    .catch((error) => {
-      if (error instanceof mongoose.Error.ValidationError) {
-        throw new ValidationError('Некорректные данные');
-      }
-      next(error);
-    });
+    .catch(next);
 };
 
 const updateAvatar = (req, res, next) => {
@@ -113,22 +89,13 @@ const updateAvatar = (req, res, next) => {
       }
       res.status(200).send(user);
     })
-    .catch((error) => {
-      if ((error instanceof mongoose.Error.CastError)
-        || (error instanceof mongoose.Error.ValidationError)) {
-        throw new ValidationError('Некорректные данные');
-      }
-      next(error);
-    });
-};
+    .catch(next);
+  }
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  if (!email || !password) throw new ValidationError('Поля email или пароль не могут быть пустыми');
   User.findOne({ email }).select('+password')
     .then((user) => {
-      if (!user) throw new UnauthorizedError('Пользователь с таким email не существует');
-      else {
         bcrypt.compare(password, user.password)
           .then((isPasswordValid) => {
             if (!isPasswordValid) throw new UnauthorizedError('Пароль указан неверно');
@@ -149,16 +116,9 @@ const login = (req, res, next) => {
                 avatar: user.avatar,
               });
           })
-          .catch(next);
-      }
+
     })
-    .catch((error) => {
-      if ((error instanceof mongoose.Error.CastError)
-        || (error instanceof mongoose.Error.ValidationError)) {
-        throw new ValidationError('Некорректные данные');
-      }
-      next(error);
-    });
+    .catch(next);
 };
 
 const getUserinfo = (req, res, next) => {
@@ -169,13 +129,7 @@ const getUserinfo = (req, res, next) => {
         res.status(200).send(user);
       }
     })
-    .catch((error) => {
-      if ((error instanceof mongoose.Error.CastError)
-        || (error instanceof mongoose.Error.ValidationError)) {
-        throw new ValidationError('Некорректные данные');
-      }
-      next(error);
-    });
+    .catch(next);
 };
 
 module.exports = {

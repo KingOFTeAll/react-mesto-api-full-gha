@@ -5,12 +5,12 @@
   
 Пожалуйста, прикрепите в это описание ссылку на сайт, размещенный на Яндекс.Облаке.
 
-Адрес репозитория: https://github.com/...
+Адрес репозитория: https://github.com/KingOFTeAll/react-mesto-api-full-gha.git
 
 ## Ссылки на проект
 
-IP-адрес x.x.x.x
+IP  84.201.152.177
 
-Frontend https://...
+Frontend https://kingoftheall.nomoreparties.co
 
-Backend https://...
+Backend https://api.kingoftheall.nomoreparties.co
