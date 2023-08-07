@@ -18,20 +18,20 @@ const getUsers = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
-  bcrypt.hash(password, SALT_ROUNDS)
+  bcrypt.hash(req.body.password, SALT_ROUNDS)
     .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
+      email: req.body.email,
       password: hash,
+      name: req.body.name,
+      about: req.body.about,
+      avatar: req.body.avatar,
     }))
     .then((user) => {
       res.status(201).send({
-        _id: user._id, name, about, avatar, email,
+        email: user.email,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
       });
     })
     .catch(next);
@@ -94,7 +94,7 @@ const login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь не найден');
+        throw new UnauthorizedError('Пользователь не найден');
       }
       bcrypt.compare(password, user.password)
         .then((isPasswordValid) => {

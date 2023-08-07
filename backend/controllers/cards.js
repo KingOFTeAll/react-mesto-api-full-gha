@@ -35,10 +35,10 @@ const deleteCard = (req, res, next) => {
       if (!card.owner.equals(req.user._id)) {
         throw new ForbiddenError('Нет прав для удаление карточки');
       }
-      Card.deleteOne(card)
-        .then(() => {
-          res.send(card);
-        });
+      return card.deleteOne();
+    })
+    .then((card) => {
+      res.send(card);
     })
     .catch(next);
 };
@@ -50,11 +50,11 @@ const addLike = (req, res, next) => {
     .findByIdAndUpdate(
       cardId,
       { $addToSet: { likes: req.user._id } },
-      { new: true, runValidators: true },
+      { new: true },
     )
     .then((card) => {
       if (!card) {
-        throw new NotFoundError('Карточка не найден');
+        throw new NotFoundError('Карточка не найдена');
       }
       res.send(card);
     })
