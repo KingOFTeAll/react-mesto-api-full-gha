@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
@@ -6,8 +5,6 @@ const config = require('../config');
 const User = require('../models/user');
 
 const NotFoundError = require('../errors/not-found-err');
-const ValidationError = require('../errors/validation-err');
-const ConflictError = require('../errors/conflict-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
 
 const SALT_ROUNDS = 10;
@@ -24,20 +21,20 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-        bcrypt.hash(password, SALT_ROUNDS)
-        .then((hash) => User.create({
-          name,
-          about,
-          avatar,
-          email,
-          password: hash,
-        }))
-        .then((user) => {
-          res.status(201).send({
-            _id: user._id, name, about, avatar, email,
-          });
-        })
-        .catch(next);
+  bcrypt.hash(password, SALT_ROUNDS)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then((user) => {
+      res.status(201).send({
+        _id: user._id, name, about, avatar, email,
+      });
+    })
+    .catch(next);
 };
 
 const getUser = (req, res, next) => {
@@ -90,33 +87,35 @@ const updateAvatar = (req, res, next) => {
       res.status(200).send(user);
     })
     .catch(next);
-  }
+};
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findOne({ email }).select('+password')
     .then((user) => {
-        bcrypt.compare(password, user.password)
-          .then((isPasswordValid) => {
-            if (!isPasswordValid) throw new UnauthorizedError('Пароль указан неверно');
-            const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, { expiresIn: '7d' });
-            res
-              .cookie('jwt', token, {
-                maxAge: 3600 * 24 * 7,
-                httpOnly: true,
-                sameSite: 'none',
-                secure: true,
-              })
-              .status(200)
-              .send({
-                _id: user._id,
-                email: user.email,
-                name: user.name,
-                about: user.about,
-                avatar: user.avatar,
-              });
-          })
-
+      if (!user) {
+        throw new NotFoundError('Пользователь не найден');
+      }
+      bcrypt.compare(password, user.password)
+        .then((isPasswordValid) => {
+          if (!isPasswordValid) throw new UnauthorizedError('Пароль указан неверно');
+          const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, { expiresIn: '7d' });
+          res
+            .cookie('jwt', token, {
+              maxAge: 3600 * 24 * 7,
+              httpOnly: true,
+              sameSite: 'none',
+              secure: true,
+            })
+            .status(200)
+            .send({
+              _id: user._id,
+              email: user.email,
+              name: user.name,
+              about: user.about,
+              avatar: user.avatar,
+            });
+        });
     })
     .catch(next);
 };

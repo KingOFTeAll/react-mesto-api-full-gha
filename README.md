@@ -11,6 +11,8 @@
 
 IP  84.201.152.177
 
-Frontend https://kingoftheall.nomoreparties.co
-
+Frontend https://kingoftheall.nomoreparties.co 
+Висит ошибка 403(на прошлом сервере не было)
+пробовал команду sudo chown -R $USER:www-data /home/kingoftheall/front/build
+не работает
 Backend https://api.kingoftheall.nomoreparties.co

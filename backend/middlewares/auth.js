@@ -8,7 +8,7 @@ const auth = (req, res, next) => {
 
   if (!token) {
     next(new UnauthorizedError('Необходима авторизация'));
-  return;
+    return;
   }
 
   let payload;
